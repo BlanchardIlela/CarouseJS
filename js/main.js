@@ -12,10 +12,11 @@ class Carousel {
             slidesVisible: 1
         }, options)
         let children = [].slice.call(element.children)  
-        let root = this.createDivWithClass('carousel')
+        this.currentItem = 0
+        this.root = this.createDivWithClass('carousel')
         this.container = this.createDivWithClass('carousel__container')
-        root.appendChild(this.container)
-        this.element.appendChild(root)
+        this.root.appendChild(this.container)
+        this.element.appendChild(this.root)
         this.items = children.map((child) => {
             let item = this.createDivWithClass('carousel__item')
             item.appendChild(child)
@@ -23,12 +24,47 @@ class Carousel {
             return item
         })
         this.setStyle()
+        this.createNavigation()
     }
+
+    /**
+     * Applique les bonnes dimensions aux éléments du carousel
+     */
 
     setStyle () {
         let ratio = this.items.length / this.options.slidesVisible
         this.container.style.width = (ratio * 100) + "%"
-        this.items.forEach(item => item.style.width = ((100 / this.options.slidesVisible) / root) + "%")
+        this.items.forEach(item => item.style.width = ((100 / this.options.slidesVisible) / this.root) + "%")
+    }
+
+    createNavigation () {
+        let nexButton = this.createDivWithClass('carousel__next')
+        let prevButton = this.createDivWithClass('carousel__prev')
+        this.root.appendChild(nexButton)
+        this.root.appendChild(prevButton)
+        nexButton.addEventListener('click', this.next.bind(this))
+        prevButton.addEventListener('click', this.prev.bind(this))
+    }
+
+    next () {
+        this.gotoItem(this.currentItem + this.options.slidesToScroll)
+
+    }
+
+    prev () {
+        this.gotoItem(this.currentItem - this.options.slidesToScroll)
+
+    }
+
+    /**
+     * Déplacer le carousel vers l'élément cible
+     * @param {number} index 
+     */
+
+    gotoItem (index) {
+        let translateX = index * -100 / this.items.length
+        this.container.style.transform = 'translate3d(' + translateX + '%, 0, 0)'
+        this.currentItem = index
     }
 
     /**
