@@ -4,12 +4,15 @@ class Carousel {
      * @param {HTMLElement} element 
      * @param {Object} options.slidesToScroll Nombre d'éléments à faire défiler
      * @param {Object} options.slidesVisible Nombre d'éléments visible dans un slide  
+     * @param {boolean} options.loop Doit-t-on boucler en fin de carousel
+     * 
      */
     constructor (element, options = {}) {
         this.element = element
         this.options = Object.assign({}, {
             slidesToScroll: 1,
-            slidesVisible: 1
+            slidesVisible: 1,
+            loop: false
         }, options)
         let children = [].slice.call(element.children)  
         this.currentItem = 0
@@ -62,9 +65,18 @@ class Carousel {
      */
 
     gotoItem (index) {
+        if (index < 0) {
+            index = this.items.length - this.options.slidesVisible
+        } else if (index >= this.items.length || this.items[this.currentItem + this.options.slidesVisible] === undefined) {
+            index = 0
+        }
         let translateX = index * -100 / this.items.length
         this.container.style.transform = 'translate3d(' + translateX + '%, 0, 0)'
         this.currentItem = index
+    }
+
+    onMove (cb) {
+        this.moveCallacks.push(cb)
     }
 
     /**
@@ -83,6 +95,7 @@ class Carousel {
 
 document.addEventListener('DOMContentLoaded', function () {
     new Carousel(document.querySelector('#carousel1'), {
-    slidesVisible: 3
+    slidesVisible: 3,
+    slidesToScroll: 2
     })
 })
